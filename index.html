@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#082624">
+<title>MASTERPOOL 3.0 · Resultados de torneos</title>
+<style>
+ :root{color-scheme:dark;--bg:#061f20;--panel:#123c37;--line:#397568;
+       --gold:#f8ca53;--text:#fff;--muted:#d3e6df;--green:#56dfaa}
+ *{box-sizing:border-box}
+ body{margin:0;background:linear-gradient(145deg,#0f3c35,var(--bg) 60%);min-height:100vh;
+      color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+ .wrap{width:min(1080px,94%);margin:0 auto;padding:24px 0 70px}
+ a{color:var(--gold)}button,input,select{font:inherit}
+ .top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+ .brand{color:var(--gold);font-size:13px;letter-spacing:.19em;font-weight:950}
+ h1{font-size:clamp(29px,5.7vw,49px);margin:6px 0 0;line-height:1.1}
+ .intro{font-size:clamp(15px,2.4vw,19px);color:var(--muted);margin:13px 0 0;line-height:1.5}
+ .btn,.back{display:inline-flex;justify-content:center;align-items:center;gap:9px;
+            padding:11px 16px;background:#185145;color:white;border:1px solid #69a895;
+            border-radius:12px;font-weight:800;text-decoration:none;cursor:pointer;min-height:44px}
+ .btn:hover,.btn:focus-visible,.back:hover,.back:focus-visible{border-color:var(--gold);outline:2px solid var(--gold)}
+ .btn:disabled{opacity:.5;cursor:not-allowed}
+ .back{font-size:14px}
+ .status{margin:20px 0 24px;display:inline-flex;gap:10px;padding:10px 15px;
+         border:1px solid #4a8b72;border-radius:999px;background:#143e38;
+         font-size:13px;font-weight:700;color:#edfff7}
+ .dot{color:var(--green)}
+ .status.offline{border-color:#9e874c;color:#ffe6a6}.status.offline .dot{color:var(--gold)}
+ .box{background:#0d3432dd;border:1px solid #477468;border-radius:16px;padding:21px;margin:18px 0 25px}
+ .heading{font-size:clamp(22px,3.6vw,29px);margin:32px 0 14px}
+ .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,265px),1fr));gap:13px}
+ .tile{display:flex;flex-direction:column;justify-content:center;gap:7px;border:1px solid var(--line);
+       border-radius:14px;background:linear-gradient(150deg,#21584b,#103b36);
+       color:#fff;text-decoration:none;padding:19px;min-height:86px}
+ .tile:hover,.tile:focus-visible{outline:2px solid var(--gold);border-color:var(--gold)}
+ .tile[hidden]{display:none}
+ .tag{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--gold);font-weight:950}
+ .tile strong{font-size:clamp(18px,2.6vw,23px);line-height:1.2;overflow-wrap:anywhere}
+ .tile small{color:var(--muted);font-size:13px;line-height:1.5}
+ input[type=search]{display:block;width:min(100%,420px);min-height:46px;
+      background:#143c36;border:1px solid #599383;border-radius:10px;
+      padding:10px 13px;color:#fff;outline-offset:3px}
+ input[type=search]::placeholder{color:#a8c9bd}
+ input[type=search]:focus{outline:2px solid var(--gold)}
+ .empty{background:#102f2d;border:1px dashed #609082;border-radius:14px;
+        padding:24px;color:#e7f4ef;font-size:16px}
+ #detail{display:none}#detail.visible{display:block}
+ #listado.oculto{display:none}
+ .hero{background:#153f37;border:1px solid #54907b;border-radius:17px;padding:20px;margin-top:18px}
+ .hero h2{font-size:clamp(24px,4vw,33px);margin:7px 0 11px}
+ .competition-meta{font-size:14px;font-weight:750;color:var(--gold);margin:0 0 10px;line-height:1.5}
+ .facts{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+ .fact{border-radius:999px;padding:8px 12px;background:#0b2b2c;color:#f8f4e6;font-size:13px;font-weight:750}
+ .winner{color:var(--gold);font-size:17px;font-weight:850;margin:12px 0 0}
+ .rankbox{overflow-x:auto;border:1px solid #3c756b;border-radius:12px;margin-top:14px}
+ table{border-collapse:collapse;width:100%;font-size:14px}
+ th,td{padding:12px 10px;border-bottom:1px solid #315c53;text-align:left;white-space:nowrap}
+ th{background:#194a40;color:var(--gold);font-size:12px;letter-spacing:.045em}
+ tr:nth-child(even) td{background:#133b36}
+ .round{background:#102d2d;border:1px solid #34665d;border-radius:12px;margin:11px 0;overflow:hidden}
+ .round summary{padding:15px 17px;font-weight:900;cursor:pointer;background:#18473d}
+ .match{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:15px 16px;
+        border-top:1px solid #315951;align-items:center}
+ .names{min-width:0}.names div{font-weight:720;overflow-wrap:anywhere;padding:3px 0}
+ .names .ganador{color:var(--gold)}
+ .vs{font-size:11px;color:#b6d8c9;padding:0 4px}
+ .score{font-weight:950;font-size:22px;text-align:right;min-width:65px;white-space:nowrap}
+ .score small{display:block;font-weight:600;font-size:11px;color:var(--muted)}
+ .match-meta{font-size:12px;color:var(--muted);margin-top:4px}
+ .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 12px}
+ .tabs button{background:#0f3734;color:#e8f9f1;border:1px solid #4e8677;
+              border-radius:11px;padding:11px 17px;font-weight:850;cursor:pointer;min-height:46px}
+ .tabs button[aria-selected="true"]{background:#f8ca53;color:#142c27;border-color:#f8ca53}
+ .tabs button:focus-visible{outline:3px solid white;outline-offset:2px}
+ .view[hidden]{display:none!important}
+ .bracket-help{font-size:14px;color:var(--muted);margin:10px 0 18px;line-height:1.5}
+ .bracket-phase{margin:25px 0 32px}
+ .bracket-phase h3{font-size:21px;margin:0 0 11px;color:#fff}
+ .bracket-scroll{overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;
+                 border:1px solid #397568;border-radius:13px;background:#0a2829;padding:12px}
+ .bracket-track{display:flex;align-items:stretch;gap:43px;position:relative;width:max-content}
+ .bracket-column{width:218px;flex:none;display:flex;flex-direction:column;z-index:1}
+ .bracket-column h4{margin:0;min-height:41px;padding:10px 4px;color:var(--gold);font-size:14px;text-align:center}
+ .bracket-items{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:9px;padding:7px 0}
+ .bracket-card{min-height:86px;display:flex;flex-direction:column;justify-content:center;gap:5px;
+               background:#185047;border:1px solid #599383;border-radius:10px;padding:9px 11px;overflow:hidden}
+ .bracket-card .match-title{font-size:11px;color:#c3dbd2}
+ .bracket-player{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:700}
+ .bracket-player span:first-child{overflow-wrap:anywhere;min-width:0}
+ .bracket-player.winner{color:var(--gold)}
+ .bracket-score{white-space:nowrap;font-weight:900}
+ .bracket-lines{position:absolute;left:0;top:0;pointer-events:none;z-index:0;overflow:visible}
+ .bracket-scroll:focus-visible{outline:2px solid var(--gold)}
+ @media(max-width:600px){.wrap{width:95%;padding-top:18px}.bracket-column{width:188px}.bracket-track{gap:29px}.bracket-scroll{padding:8px}}
+ .footer{margin-top:40px;border-top:1px solid #4c736a;padding-top:20px;color:#bad5cd;
+         line-height:1.6;font-size:13px}
+ @media(min-width:850px){.match{grid-template-columns:minmax(0,1fr) auto;padding:15px 20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="brand">MASTERPOOL 3.0 · RESULTADOS</div>
+      <h1>Torneos y clasificaciones</h1>
+      <p class="intro">Consulta los resultados, los cuadros de competición y la clasificación de las ligas.</p>
+    </div>
+  </header>
+  <div id="connection" class="status" role="status"><span class="dot">●</span>
+    <span id="connection-text">Consultando los resultados…</span></div>
+
+
+  <main id="listado">
+    <label for="search">Buscar torneo</label>
+    <div style="margin-top:8px"><input id="search" type="search" placeholder="Escribe un nombre…" autocomplete="off"></div>
+    <h2 class="heading">Campeonatos individuales</h2>
+    <div class="tiles" id="torneos"><div class="empty">Cargando campeonatos…</div></div>
+    <h2 class="heading" id="league-heading">Liga de carambolas por equipos</h2>
+    <div class="tiles" id="ligas"><div class="empty">Cargando encuentros…</div></div>
+  </main>
+
+  <main id="detail">
+    <a class="back" id="return-results" href="./index.html">← Volver a todos los campeonatos</a>
+    <div class="hero" id="detail-head"></div>
+    <div id="detail-tables"></div>
+  </main>
+
+  <footer class="footer">Información pública de consulta. La organización del club actualiza los resultados.</footer>
+</div>
+<script>
+(() => {
+ 'use strict';
+ const $ = id => document.getElementById(id);
+ const params = new URLSearchParams(location.search);
+ const tid = params.get('torneo') || '';
+ const lid = params.get('liga') || '';
+ $('return-results').href = './index.html';
+ let cache = null, lastSignature = '';
+ const e = (tag,cls,content) => {
+   const node = document.createElement(tag);
+   if(cls) node.className=cls;
+   if(content !== undefined) node.textContent=String(content);
+   return node;
+ };
+ const enlace = (title,href,subtitulo='') => {
+   const a=e('a','tile');a.href=href;
+   a.append(e('strong','',title));
+   if(subtitulo)a.append(e('small','',subtitulo));
+   return a;
+ };
+ const valor = x => (Number.isInteger(x) ? String(x) : '—');
+ const estado = code => ({
+   registration:'Inscripciones',drawn:'Sorteado',playing:'En competición',
+   finished:'Finalizado',waiting:'Esperando',ready:'Por jugar',
+   assigned:'En juego',bye:'Pase WO',wo:'WO',void:'No disputada',
+ })[code] || 'Pendiente';
+ const modalidad = code => ({
+   carom:'Carambolas',pool8:'Pool bola 8',pool9:'Pool bola 9',
+   pool10:'Pool bola 10','14.1':'Pool 14.1'})[code] || code || '';
+ const formato = code => ({
+   directa:'Eliminación directa',doble_europeo:'Doble KO europeo',
+   doble_tradicional:'Doble KO tradicional',grupos_ko:'Grupos y KO',
+   dos_cuadros:'Dos cuadros',liga:'Liga'})[code] || code || '';
+ const setEstado = (message,offline=false) => {
+   $('connection').classList.toggle('offline',offline);
+   $('connection-text').textContent=message;
+ };
+ const addEmpty = (parent,content) => parent.replaceChildren(e('div','empty',content));
+ const filterCards = () => {
+   const q=$('search').value.toLocaleLowerCase('es-ES').trim();
+   for (const card of document.querySelectorAll('.tile')) {
+     card.hidden = !card.textContent.toLocaleLowerCase('es-ES').includes(q);
+   }
+ };
+ function drawIndex(data) {
+   const torneos=$('torneos'), ligas=$('ligas');
+   torneos.replaceChildren();ligas.replaceChildren();
+   for(const t of data.torneos || []) {
+     torneos.append(enlace(t.nombre,'./index.html?torneo='+encodeURIComponent(t.archivo),
+       [modalidad(t.modalidad),formato(t.formato)].filter(Boolean).join(' · ')));
+   }
+   for(const f of data.ligaEquipos || []) {
+     ligas.append(enlace(f.local+' — '+f.visitante,
+       './index.html?liga='+encodeURIComponent(f.archivo)));
+   }
+   if(!torneos.childElementCount)addEmpty(torneos,'Todavía no se han publicado campeonatos.');
+   $('league-heading').hidden=!ligas.childElementCount;
+   ligas.hidden=!ligas.childElementCount;
+   filterCards();
+ }
+ const addFact=(parent,value)=>parent.append(e('span','fact',value));
+ const table=(columns,rows)=>{
+   const wrap=e('div','rankbox'),t=e('table'),head=e('thead'),tr=e('tr');
+   for(const name of columns)tr.append(e('th','',name));head.append(tr);t.append(head);
+   const body=e('tbody');
+   for(const row of rows){const r=e('tr');for(const value of row)r.append(e('td','',value));body.append(r);}
+   t.append(body);wrap.append(t);return wrap;
+ };
+ let vistaActiva = 'partidas';
+ let seccionesCuadrante = [];
+ function renderLinks(seccion) {
+   const track=seccion.querySelector('.bracket-track');
+   const svg=seccion.querySelector('.bracket-lines');
+   if(!track || !svg || track.clientHeight===0)return;
+   const box=track.getBoundingClientRect();
+   const width=track.scrollWidth,height=track.scrollHeight;
+   svg.setAttribute('width',String(width));
+   svg.setAttribute('height',String(height));
+   svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+   svg.replaceChildren();
+   for(const tarjeta of track.querySelectorAll('.bracket-card[data-next]')){
+     const siguiente=tarjeta.dataset.next;
+     const destino=Array.from(track.querySelectorAll('.bracket-card'))
+       .find(c=>c.dataset.idx===siguiente);
+     if(!destino || destino===tarjeta)continue;
+     const a=tarjeta.getBoundingClientRect(),b=destino.getBoundingClientRect();
+     if(b.left<=a.left)continue;
+     const x1=a.right-box.left,y1=(a.top+a.bottom)/2-box.top;
+     const x2=b.left-box.left,y2=(b.top+b.bottom)/2-box.top;
+     const mid=(x1+x2)/2;
+     const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+     path.setAttribute('d',`M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`);
+     path.setAttribute('stroke','#7fbaac');path.setAttribute('stroke-width','1.8');
+     path.setAttribute('fill','none');svg.append(path);
+   }
+ }
+ function pintaConexiones(){
+   for(const seccion of seccionesCuadrante)renderLinks(seccion);
+ }
+ window.addEventListener('resize',()=>{if(vistaActiva==='cuadrante')requestAnimationFrame(pintaConexiones)});
+ function pintaCuadrante(t, destino){
+   seccionesCuadrante=[];
+   const fases={W:'Cuadro de ganadores',L:'Cuadro de perdedores',
+     A:'Cuadro A',B:'Cuadro B',F:'Eliminatorias'};
+   const matches=t.partidas||[];
+   let hayFase=false;
+   for(const fase of ['A','B','W','L','F']){
+     const parte=matches.filter(p=>p.fase===fase && p.ronda>0);
+     if(!parte.length)continue;
+     hayFase=true;
+     const seccion=e('section','bracket-phase');
+     seccion.append(e('h3','',fases[fase]));
+     const viewport=e('div','bracket-scroll');
+     viewport.tabIndex=0;viewport.setAttribute('aria-label','Desplazar cuadrante de '+fases[fase]);
+     const track=e('div','bracket-track');
+     const rondas=[...new Set(parte.map(p=>p.ronda))].sort((a,b)=>a-b);
+     const maxPartidas=Math.max(...rondas.map(r=>parte.filter(p=>p.ronda===r).length));
+     track.style.height=Math.max(195,maxPartidas*109+42)+'px';
+     const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+     svg.classList.add('bracket-lines');svg.setAttribute('aria-hidden','true');
+     track.append(svg);
+     for(const ronda of rondas){
+       const col=e('div','bracket-column');col.append(e('h4','','Ronda '+ronda));
+       const items=e('div','bracket-items');
+       for(const p of parte.filter(p=>p.ronda===ronda)){
+         const card=e('div','bracket-card');
+         card.dataset.idx=String(p.indice);
+         if(p.siguiente)card.dataset.next=String(p.siguiente);
+         card.append(e('div','match-title',
+           (p.numero?p.numero+' · ':'')+estado(p.estado)));
+         for(let i=0;i<2;i++){
+           const played=p.tanteo && p.tanteo.length===2;
+           const player=e('div','bracket-player'+(p.ganador && p.ganador===p.jugadores[i]?' winner':''));
+           player.append(e('span','',p.jugadores[i]||'Por definir'),
+                         e('span','bracket-score',played?String(p.tanteo[i]):'—'));
+           card.append(player);
+         }
+         items.append(card);
+       }
+       col.append(items);track.append(col);
+     }
+     viewport.append(track);seccion.append(viewport);destino.append(seccion);
+     seccionesCuadrante.push(seccion);
+   }
+   if(!hayFase){
+     addEmpty(destino,'El cuadrante aparecerá cuando se realice el sorteo eliminatorio.');
+   }
+ }
+ function drawTournament(t) {
+   const head=$('detail-head'),main=$('detail-tables');
+   const primeraCarga=!head.firstElementChild;
+   const previousOpen=new Set(Array.from(main.querySelectorAll('details[open]'))
+                         .map(row=>row.dataset.ronda));
+   const wasRendered=!!main.querySelector('details');
+   const scrollPosition=seccionesCuadrante.map(el=>el.querySelector('.bracket-scroll')?.scrollLeft||0);
+   head.replaceChildren();main.replaceChildren();
+   head.append(e('h2','',t.nombre));
+   const datos=[modalidad(t.modalidad),formato(t.formato)].filter(Boolean).join(' · ');
+   if(datos)head.append(e('p','competition-meta',datos));
+   if(t.campeon)head.append(e('p','winner','🏆 Campeón: '+t.campeon));
+   const esLiga=t.formato==='liga';
+   const tieneCuadrante=!esLiga;
+   const etiquetaClasificacion=t.estado==='finished'?'Clasificación final':'Clasificación provisional';
+   const tabs=e('div','tabs');
+   const partidasButton=e('button','','Partidas y resultados');
+   partidasButton.type='button';partidasButton.setAttribute('aria-selected','false');
+   tabs.append(partidasButton);
+   let clasificacionButton=null;
+   if(esLiga){
+     clasificacionButton=e('button','',etiquetaClasificacion);
+     clasificacionButton.type='button';
+     clasificacionButton.setAttribute('aria-selected','false');
+     tabs.append(clasificacionButton);
+   }
+   let cuadranteButton=null;
+   if(tieneCuadrante){
+     cuadranteButton=e('button','','Ver cuadrante');
+     cuadranteButton.type='button';cuadranteButton.setAttribute('aria-selected','false');
+     tabs.append(cuadranteButton);
+   }
+   const panelPartidas=e('section','view');
+   const panelClasificacion=e('section','view');
+   const panelCuadrante=e('section','view');
+   const cambiarVista=(nombre)=>{
+     vistaActiva=nombre;
+     panelPartidas.hidden=nombre!=='partidas';
+     panelClasificacion.hidden=nombre!=='clasificacion';
+     panelCuadrante.hidden=nombre!=='cuadrante';
+     partidasButton.setAttribute('aria-selected',String(nombre==='partidas'));
+     if(clasificacionButton)clasificacionButton.setAttribute('aria-selected',String(nombre==='clasificacion'));
+     if(cuadranteButton)cuadranteButton.setAttribute('aria-selected',String(nombre==='cuadrante'));
+     if(nombre==='cuadrante')requestAnimationFrame(pintaConexiones);
+   };
+   partidasButton.addEventListener('click',()=>cambiarVista('partidas'));
+   if(clasificacionButton)clasificacionButton.addEventListener('click',()=>cambiarVista('clasificacion'));
+   if(cuadranteButton)cuadranteButton.addEventListener('click',()=>cambiarVista('cuadrante'));
+   main.append(tabs,panelPartidas,panelClasificacion,panelCuadrante);
+   if(esLiga){
+     panelClasificacion.append(e('h2','heading',etiquetaClasificacion));
+     if((t.clasificacion||[]).some(r=>r.jugados>0)){
+       panelClasificacion.append(e('p','bracket-help',
+         t.estado==='finished'?'Clasificación al finalizar la liga.':
+         'Solo cuentan las partidas con resultado confirmado. La clasificación puede cambiar.'));
+       panelClasificacion.append(table(['#','Deportista','J','G','E','P','Pts','Favor','Contra'],
+         t.clasificacion.map(r=>[r.puesto,r.nombre,r.jugados,r.ganados,
+           r.empatados,r.perdidos,r.puntos,r.favor,r.contra])));
+     }else{
+       addEmpty(panelClasificacion,'La clasificación aparecerá cuando se confirme la primera partida de liga.');
+     }
+   }
+   for(const group of t.grupos||[]){
+     panelPartidas.append(e('h2','heading','Clasificación '+group.nombre));
+     panelPartidas.append(table(['#','Deportista','J','G','P','Pts','Favor','Contra'],
+       group.clasificacion.map(r=>[r.puesto,r.nombre,r.jugados,r.ganados,
+         r.perdidos,r.puntos,r.favor,r.contra])));
+   }
+   panelPartidas.append(e('h2','heading','Enfrentamientos y resultados'));
+   if(!t.partidas?.length){
+     panelPartidas.append(e('div','empty','Este campeonato todavía está en inscripciones.'));
+   }else{
+     const grupos=new Map();
+     for(const p of t.partidas){
+       const names={J:'Liga · Jornada ',G:'Grupos · Ronda ',W:'Ganadores · Ronda ',
+         L:'Perdedores · Ronda ',A:'Cuadro A · Ronda ',B:'Cuadro B · Ronda ',
+         F:'Eliminatorias · Ronda '};
+       const label=(names[p.fase]||'Ronda ')+p.ronda;
+       if(!grupos.has(label))grupos.set(label,[]);
+       grupos.get(label).push(p);
+     }
+     let shown=0;
+     for(const [name,partidas] of grupos){
+       const details=e('details','round'),summary=e('summary','',name+' · '+partidas.length+' partidas');
+       details.dataset.ronda=name;
+       if(previousOpen.has(name)||(!wasRendered&&!shown&&
+          partidas.some(p=>['assigned','ready'].includes(p.estado)))){
+         details.open=true;shown=1;
+       }
+       details.append(summary);
+       for(const p of partidas){
+         const row=e('div','match'),names=e('div','names');
+         const left=e('div',p.ganador===p.jugadores[0]?'ganador':'',p.jugadores[0]);
+         const right=e('div',p.ganador===p.jugadores[1]?'ganador':'',p.jugadores[1]);
+         names.append(left,e('div','vs','CONTRA'),right);
+         names.append(e('div','match-meta',(p.numero?p.numero+' · ':'')
+           +estado(p.estado)+(p.mesa?' · Mesa '+p.mesa:'')));
+         const score=e('div','score',p.tanteo?p.tanteo.join(' – '):'—');
+         score.append(e('small','',p.estado==='assigned'?'Marcador en directo':''));
+         row.append(names,score);details.append(row);
+       }
+       panelPartidas.append(details);
+     }
+   }
+   if(tieneCuadrante){
+     panelCuadrante.append(e('p','bracket-help',
+       'Desliza el cuadrante hacia los lados para seguir las rondas. Los resultados se actualizan automáticamente.'));
+     pintaCuadrante(t,panelCuadrante);
+   }
+   if(primeraCarga && esLiga)vistaActiva='clasificacion';
+   if(esLiga && vistaActiva==='cuadrante')vistaActiva='clasificacion';
+   if(!esLiga && vistaActiva==='clasificacion')vistaActiva='partidas';
+   cambiarVista(vistaActiva);
+   seccionesCuadrante.forEach((el,i)=>{
+     const scroll=el.querySelector('.bracket-scroll');if(scroll)scroll.scrollLeft=scrollPosition[i]||0;
+   });
+ }
+ function drawTeam(f){
+   const head=$('detail-head'),main=$('detail-tables');
+   head.replaceChildren();main.replaceChildren();
+   head.append(e('span','tag','Liga de carambolas por equipos'),
+               e('h2','',f.local+' — '+f.visitante));
+   const facts=e('div','facts');
+   [f.division,f.temporada,f.jornada,f.fecha,f.completas+'/4 partidas'].filter(Boolean)
+     .forEach(v=>addFact(facts,v));
+   head.append(facts);
+   if(f.puntos)head.append(e('p','winner','Puntos del encuentro: '+f.puntos.join(' – ')));
+   main.append(e('h2','heading','Partidas y actas'));
+   for(const r of f.filas || []){
+     const names=e('div','names');
+     names.append(e('div','',r.local),e('div','vs','CONTRA'),e('div','',r.visitante),
+       e('div','match-meta','Partida '+r.posicion+
+         (r.mesa?' · Mesa '+r.mesa:'')+
+         (r.entradas!==null?' · '+r.entradas+' entradas':'')));
+     const score=e('div','score',r.tanteo?r.tanteo.join(' – '):'—');
+     const row=e('div','match');row.append(names,score);
+     const box=e('div','round');box.append(row);main.append(box);
+   }
+ }
+ const viewId = tid || lid;
+ if(viewId) {
+   $('listado').classList.add('oculto');
+   $('detail').classList.add('visible');
+ }
+ async function refresh() {
+   // Edición pública estática: la información la exporta Windows, no hay API administrativa.
+   const identificador = tid || lid;
+   if (identificador && !/^[a-f0-9]{24}$/.test(identificador)) {
+     setEstado('Enlace de campeonato no válido', true);
+     return;
+   }
+   const url = tid ? './datos/torneos/'+tid+'.json' : lid ? './datos/ligas/'+lid+'.json' : './datos/indice.json';
+   try {
+     const response=await fetch(url,{cache:'no-store'});
+     if(!response.ok) throw new Error('No se han podido cargar los datos');
+     const data=await response.json();
+     const value=data.torneo||data.liga||{torneos:data.torneos,ligaEquipos:data.ligaEquipos};
+     const signature=JSON.stringify(value);
+     const fecha=new Date(data.actualizado*1000);
+     const publicado = Number.isFinite(fecha.getTime()) && fecha.getTime()>0;
+     setEstado(publicado
+       ? 'Última publicación del club: '+fecha.toLocaleString('es-ES',{dateStyle:'short',timeStyle:'medium'})
+       : 'Preparado para recibir los primeros resultados');
+     if(signature!==lastSignature){
+       lastSignature=signature;
+       if(tid)drawTournament(data.torneo);
+       else if(lid)drawTeam(data.liga);
+       else drawIndex(data);
+     }
+     cache=data;
+   } catch(err) {
+     setEstado('No se han podido cargar los resultados publicados',true);
+     if(!cache&&viewId){
+       addEmpty($('detail-tables'),'No se ha podido acceder a este campeonato.');
+     }
+   }
+ }
+ $('search').addEventListener('input',filterCards);
+ refresh();
+ setInterval(refresh,20000);
+})();
+</script>
+</body>
+</html>
